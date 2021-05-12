@@ -183,7 +183,7 @@ SC中的位置标识方式
 
 RL部分输出增加一层mask使非法位置概率为0
 
-##### 模型结构
+##### 推理模型
 
 CNN模型
 
@@ -371,7 +371,7 @@ TorchCraftAI提供了多种scenarios，提供多种微操场景
 
 ***以上特征包括必要的归一化处理到[-1, 1]***
 
-##### 模型
+##### 模型结构
 
 输入：
 
@@ -386,6 +386,7 @@ U = unitNum or enemyNum
 ##### MLP对unitFeats用encoder编码
 
 ##### potential field
+
 分别用四个网络处理编码后输入，输出友军和敌军的embedding和[potential field](http://aigamedev.com/open/tutorials/potential-fields/) parameterization
 
 embedding net输出为U x EmbedNum的tensor
@@ -412,10 +413,11 @@ $$
 > 个人理解：
 >
 > 敌我每个单位包含坐标(x, y)和feature，feature经过encode和embedding之后变为等长向量，根据所在位置(x, y)和势能核(w1, w2)将embedded vectors张成势能图，势能核为加权值，经过sum和max pooling之后最终基准特征为两倍embedding（敌我）维度的图层集合
-> 
+>
 > 再在spatial potential field中抽取对应unit位置的向量作为特征（spatial embedding）
 
 ##### movement action net
+
 1. ***ourMovementScores***
 
 输入行为单位周围20 x 20的movement plane，包括
@@ -423,8 +425,6 @@ $$
 potential field片段（2E），连接map embedding（E_map）之后的片段，再连接unit的embedding片段（E）
 
 送入3层CNN `movementNetwork_`，输出20x20维的移动分数 ***ourMovementScores***
-
-
 2. ***ourAttackScores***
 
 输入为final unit embedding + distance
@@ -436,7 +436,6 @@ distance为敌我单位两两之间欧氏距离
 另将敌我两两之间final unit embedding向量拼接起来，最终输入为[ourUnitNum, enemyUnitNum, 2x(E+2E) + distance]的tensor
 
 送入`attackNetwork_`，得到ourUnitNum x enemyUnitNum维数的攻击分数
-
 3. ***ourCommandScores***
 
 输入为我方单位的final unit embeddings
@@ -445,21 +444,23 @@ distance为敌我单位两两之间欧氏距离
 
 最终三个分数一同返回
 
-### 训练过程
+#### 训练
 
 使用Evolution Strategies（ES，演化策略）
 
-#### reward
+##### reward
 
 1/2(输赢)+1/4(击杀率)+1/8(我方存活率)+1/16(造成敌方伤害率)
 
-# 具体实验
+## 具体实验
+
 训练过程必须在Linux系统上（bp模块和micro模块）
 
 Linux上的训练设置可以不用安装游戏，只需要从Windows安装目录中将下列文件拷贝到Linux系统中某文件夹中（如MBQ/）然后设置环境变量
 `export OPENBW_MBQ_PATH=MBQ`，即可启动训练模块
 
-## 启动命令
+### 启动命令
+
 BP：
 
 `./build/tutorials/building-placer/bp-train-rl -v -1 -vmodule train-rl=1`
@@ -478,9 +479,10 @@ micro:
 
 `cherrypi.exe -hostname 127.0.0.1 -port 11111 -bp_model bwapi-data/AI/bp_model.bin`
 
-## 对战
+### 对战
 
-### bot v.s. computer
+#### bot v.s. computer
+
 命令行启动cherrypi.exe的agent，然后用Chaoslauncher.exe勾选`BWAPI 4.2.0 Injector [RELEASE]`选项，点击Start启动游戏
 
 ![ChaosLauncher](../img/chaoslauncher-config.png)
@@ -489,7 +491,8 @@ micro:
 
 选择Single Player -> Expansion -> 选定或新建ID -> Play Custom -> 选定地图 -> Game Type选Melee模式 -> 用户种族选择Zerg -> 添加Computer -> Ok启动
 
-### player v.s. bot
+#### player v.s. bot
+
 1. 还是命令行cherrypi.exe的agent，用Chaoslauncher-Multiinstance.exe先启动server游戏
 
 2. 选择Multiplayer -> Expansion -> Local PC (或Local Area Network [UDP]如果网络支持且需要) -> 选定主机用户ID -> Create Game -> 选定地图 -> 用户种族选择Zerg -> 等待
@@ -497,4 +500,3 @@ micro:
 3. 另在Chaoslauncher-Multiinstance.exe中去除`BWAPI 4.2.0 Injector [RELEASE]`的勾选（否则会报错），点击Start启动游戏
 
 4. 同样选择Multiplayer -> Expansion -> Local PC -> 选定主机用户ID（注意和主机用户ID区分） -> 就会看到上一步生成的游戏，点击加入，在server上看到加入成功点击Ok开始游戏即可
-

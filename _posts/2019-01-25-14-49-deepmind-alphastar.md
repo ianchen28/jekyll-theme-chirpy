@@ -21,18 +21,20 @@ updated: 2019-01-25 09:51
 * TOC
 {:toc}
 
-# 简介
-2019.01.25 deepmind公布了最新StarCraftII Agent AlphaStar，对职业选手Mana和TLO的战绩为10胜1负。目前Agent只支持使用Protoss族，但是架构支持所有种族无限制对战
+## 简介
 
+2019.01.25 deepmind公布了最新StarCraftII Agent AlphaStar，对职业选手Mana和TLO的战绩为10胜1负。目前Agent只支持使用Protoss族，但是架构支持所有种族无限制对战
 
 ![游戏界面](https://storage.googleapis.com/deepmind-live-cms/documents/sc2-agent-vis%2520%25281%2529.gif)
 
-# 训练过程
+## 训练过程
+
 Agent训练基于PySC2接口
 
 对单元采用transformer torso + LSTM + auto-regressive policy head (pointer net) + centralised value baseline (a3c)
 
-## multi-agent学习算法
+### multi-agent学习算法
+
 首先基于暴雪公布的历史天梯游戏数据，采用监督学习训练出V0版本模型（模拟玩家微操和宏观操作）。此agent已经可以在95%的对局中击败elite级别computer，对应人类玩家中天梯级别约为黄金。
 
 ![算法结构](https://storage.googleapis.com/deepmind-live-cms/images/SCII-BlogPost-Fig03.width-1500.png)
