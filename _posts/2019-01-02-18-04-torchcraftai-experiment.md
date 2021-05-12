@@ -23,45 +23,51 @@ updated: 2019-01-04 18:04
 
 *本文主要参考（翻译）了TorchCraftAI项目的官方文档[Tutorials](https://torchcraft.github.io/TorchCraftAI/docs/bptut-intro.html)并加入了自己在阅读和实验中的一些坑和理解*
 
-# 模块抽象
+## 模块抽象
 
-## Player
+### Player
+
 Player类调用事先连接到server上的TorchCraft client并推进游戏主循环：接收游戏state update，bot内部循环，并向server发送命令
 
-## State Representation
+### State Representation
+
 current game state (with per-Player State object)
-- current map in-game units
-- via TilesInfo, AreaInfo UnitsInfo
+
+* current map in-game units
+* via TilesInfo, AreaInfo UnitsInfo
 
 internal bot state (with per-State Blackboard instance)-黑板实例
-- key-value storage
-- communication via UPCTuples
-- maintains Tasks
 
-## Modules
+* key-value storage
+* communication via UPCTuples
+* maintains Tasks
+
+### Modules
+
 封装了一个bot的具体行为集合
 
 module实现step()接口，并被加入到Player实例，在每一帧游戏中被调用
 
 包括 [链接](https://torchcraft.github.io/TorchCraftAI/docs/modules.html)
-- 生产-收集-攻击（CreateGatherAttack）
-- 策略（Strategy）
-  - 建筑顺序（BuildOrder）
-  - 侦查（Scouting）
-  - 骚扰（Harassment）
-- 通用自动建造（GenericAutoBuild）
-- 建筑放置器（BuildingPlacer）
-- 建造器（Builder）
-- 战术（攻击/逃跑）（Tactics delete/flee）
-- 团战（攻击/逃跑/放风筝/burrow）（SquadCombat attacking/fleeing/kitting/burrowing）
-- 侦查（Scouting）
-- 收集器（Gatherer）
-- 骚扰（Harass）
-- 稳定防守集火（StaticDefenceFocusFire）
-- UPCToCommand
 
+* 生产-收集-攻击（CreateGatherAttack）
+* 策略（Strategy）
+  * 建筑顺序（BuildOrder）
+  * 侦查（Scouting）
+  * 骚扰（Harassment）
+* 通用自动建造（GenericAutoBuild）
+* 建筑放置器（BuildingPlacer）
+* 建造器（Builder）
+* 战术（攻击/逃跑）（Tactics delete/flee）
+* 团战（攻击/逃跑/放风筝/burrow）（SquadCombat attacking/fleeing/kitting/burrowing）
+* 侦查（Scouting）
+* 收集器（Gatherer）
+* 骚扰（Harass）
+* 稳定防守集火（StaticDefenceFocusFire）
+* UPCToCommand
 
-## UPCTuples
+### UPCTuples
+
 单位-位置-命令（Unit-Position-Command）元组
 
 该元组被Modules筛选，直到可以被翻译为一个真实***游戏命令***
@@ -69,11 +75,12 @@ module实现step()接口，并被加入到Player实例，在每一帧游戏中�
 ***游戏命令***代表一个事先规定好的一组抽象游戏指令
 
 Modules通常完成如下逻辑：
-- 检测（生成）可行UPCTuples，通过黑板实例（Blackboard），如下图中右侧黑板+白字
-- 执行UPCTuples
-- 发布一个或几个筛选出的TPCTuples
 
-UPCTuples还加入了state字	
+* 检测（生成）可行UPCTuples，通过黑板实例（Blackboard），如下图中右侧黑板+白字
+* 执行UPCTuples
+* 发布一个或几个筛选出的TPCTuples
+
+UPCTuples还加入了state字
 
 范例：
 
@@ -91,18 +98,21 @@ UPCTuples还加入了state字
 
 所有*可执行*的UPCTuple（即所有相关域都为Dirac分布的UPCTuple）都会被U***PCToCommand***模块翻译为TorchCraft的游戏指令
 
-## Tasks
+### Tasks
+
 Task对象用来实现具体UPCTuple（Task和UPCTuple一一对应）
 
 Task的功能：
-- 向其他Module发送UPCTUple的具体实现，并报告相关status
-- 分配units。如果实现UPCTuple需要控制unit，units被分配到相关Task。units只能在Task生成时加入，之后只能移除不能加入
-- 可以通过proxy追踪UPCTuples的实现（若后续Module失败可以重启上一步）
-- 可以存储必要数据
+
+* 向其他Module发送UPCTUple的具体实现，并报告相关status
+* 分配units。如果实现UPCTuple需要控制unit，units被分配到相关Task。units只能在Task生成时加入，之后只能移除不能加入
+* 可以通过proxy追踪UPCTuples的实现（若后续Module失败可以重启上一步）
+* 可以存储必要数据
 
 Tasks实现update()方法以根据内部事件（如unit的重新分配和Task的取消）和外部事件（如执行必要行动的unit被摧毁）更新status
 
-## Controllers
+### Controllers
+
 从属于Task对象，但实现了类似Module的step()入口，并提供了方便的方法来管理unit以及发布每个unit的UPCTuples到黑板上
 
 共享控制器（SharedController）是一个持久的控制器用以方便地增加和删除unit。该控制器在多个Task之间共享，通过中心化方法实现多个UPCTuples
