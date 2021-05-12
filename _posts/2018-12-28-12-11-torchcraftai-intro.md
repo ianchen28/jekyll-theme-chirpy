@@ -174,7 +174,7 @@ This step is needed to find nvtools correctly:
 xcopy "C:\Program Files\NVIDIA Corporation\NvToolsExt\bin\x64\nvToolsExt64_1.dll" $WORKDIR
 ```
 
-用 activate [conda name] 先进入虚拟环境，
+用 activate *conda name* 先进入虚拟环境，
 
 编译巨……慢，本文大概用了半天时间
 
