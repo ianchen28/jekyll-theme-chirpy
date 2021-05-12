@@ -3,6 +3,8 @@ layout: post
 title: DeepMind AlphaStar 简介
 updated: 2019-01-25 09:51
 math: true
+categories: [技术]
+tags: [游戏, AI, RL, 星际]
 ---
 
 * TOC

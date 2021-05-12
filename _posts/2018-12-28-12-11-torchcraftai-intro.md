@@ -2,6 +2,9 @@
 layout: post
 title: TorchCraftAI 简介和部署记录
 updated: 2018-12-28 12:11
+categories: [技术]
+tags: [游戏, AI, RL, 星际]
+
 ---
 
 * TOC
