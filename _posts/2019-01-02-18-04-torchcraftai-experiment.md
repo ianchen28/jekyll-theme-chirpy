@@ -150,12 +150,14 @@ TorchCraftAI提供的教程包括**建筑放置**和**微操**
 输出为放置建筑的位置分布
 
 #### 神经网络结构
+
 SC中的位置标识方式
+
 * pixels
 * walktiles (8x8)
 * buildtiles (4x4 walktiles，32x32 pixels)
 
-##### 输入特征
+#### 输入特征
 
 （用average pooling将walktiles转换成buildtiles）
 
@@ -175,12 +177,14 @@ SC中的位置标识方式
 输入范例：
 ![input](https://torchcraft.github.io/TorchCraftAI/docs/assets/bptut-features.png)
 
-#### 输出
+##### 输出
+
 输出为全地图范围内的建筑放置概率分布（每个buildtile的放置概率）
 
 RL部分输出增加一层mask使非法位置概率为0
 
-#### 模型结构
+##### 模型结构
+
 CNN模型
 
 金字塔结构类似：
@@ -189,7 +193,8 @@ CNN模型
 
 128x128 -> 64x64 -> 32x32 (x4) --(lateral connection)-> 64x64 --(lateral connection)-> 128x128 -> softmax -> probability
 
-#### 特征整合
+##### 特征整合
+
 大部分特征可以复用128x128 CNN模型，但unit信息特征为离散向量
 
 使用lookup table将地图上的单位类型（one-hot）映射到低维空间。映射向量被放置在单位出现的位置，多个单位同时出现的情况则简单加和
@@ -219,8 +224,8 @@ auto type2d = typeT.unsqueeze(2).unsqueeze(2).expand(
 torch::Tensor x = at::cat(
   {
     map,
-	units2d.to(map.options().device()),
-	type2d.to(map.options().device())
+    units2d.to(map.options().device()),
+    type2d.to(map.options().device())
   }, 
   1
 );
@@ -252,14 +257,16 @@ x = at::relu(postskip1->forward({x})[0]);
 torch::Tensor y = out->forward({x})[0].view({batchSize, -1});
 ```
 
-### 监督学习
+#### 监督学习
+
 [训练数据](https://github.com/TorchCraft/StarData) 来自TorchCraft，包含65646局游戏记录
 
 完整数据集包括1535M帧游戏，496M的玩家行为，压缩后356G，帧率降到8fps
 
 [论文介绍](https://arxiv.org/pdf/1708.02139.pdf)
 
-#### 采样
+##### 采样
+
 [代码](https://github.com/TorchCraft/TorchCraftAI/blob/master/scripts/building-placer/collect-replay-samples.cpp)
 
 首先重放游戏，记录各项数据信息
@@ -270,20 +277,22 @@ torch::Tensor y = out->forward({x})[0].view({batchSize, -1});
 
 分解为训练集验证集测试集
 
-#### 训练过程
+##### 训练过程
+
 输入为各个图层，输出为128x128=16384维向量的多分类问题。
 
 官方分类结果为：
 
 ![官方结果](https://torchcraft.github.io/TorchCraftAI/docs/assets/bpsup-errors.png)
 
-#### 综合评测
-对比Baseline为基于Training Set的Nearest Neibour模型
+##### 综合评测
 
+对比Baseline为基于Training Set的Nearest Neibour模型
 
 ### RL
 
 #### 通过Masking的行为空间限制
+
 由于很多区块是先天无法放置建筑，所以监督学习部分的128x128=16384维输出本身有很多是冗余的
 
 在监督学习中，可建筑区域被作为一层输入图层送入分类器，但是对RL来说从中学习出相关逻辑较为耗时，因此在RL任务中直接用Mask将其屏蔽
@@ -296,7 +305,7 @@ $$
 
 这一步将行为空间从16384压缩至10-50
 
-#### reward定义：
+#### reward定义
 
 $$
 R(a_t)=\begin{cases}
@@ -310,57 +319,68 @@ $$
 
 官方结果：胜率从基于规则的65.8%提升至78.5%
 
-## 微操
-### 行为空间
+### 微操
+
+#### 行为空间
+
 移动到何处？
 
 攻击什么单位？
 
 模型输出为：
-- 选取行动的概率分布
-- 攻击目标的概率分布
-- 移动目标的概率分布（以主体为中心的20x20的walktile范围）
+
+* 选取行动的概率分布
+* 攻击目标的概率分布
+* 移动目标的概率分布（以主体为中心的20x20的walktile范围）
 
 首先确定采取什么行动 -> 再决定选取攻击目标/移动目标
 
 TorchCraftAI提供了多种scenarios，提供多种微操场景
 
-### 对方策略
-- attack_move
-- closest
-- weakest
+#### 对方策略
 
-### 模型
-#### 输入
+* attack_move
+* closest
+* weakest
+
+#### 模型
+
+##### 输入
+
 地形特征+单位特征
 
 地图信息包括
-- 可达性（地图点能否到达）
-- 可建筑行（地图点能否放置建筑）
-- 地面高度（上下坡设计会影响miss率）
-- 战争迷雾
-- X, Y坐标（tile的绝对坐标）
+
+* 可达性（地图点能否到达）
+* 可建筑行（地图点能否放置建筑）
+* 地面高度（上下坡设计会影响miss率）
+* 战争迷雾
+* X, Y坐标（tile的绝对坐标）
 
 单位信息包括
-- 位置
-- 速度
-- 血量
-- 护甲
-- 能量
-- 射程
-- 伤害
-- 伤害类型
-- ...等等
+
+* 位置
+* 速度
+* 血量
+* 护甲
+* 能量
+* 射程
+* 伤害
+* 伤害类型
+* ...等等
 
 ***以上特征包括必要的归一化处理到[-1, 1]***
 
-#### 模型
+##### 模型
+
 输入：
-- mapFeats
-- ourLocs: [U, 2], (y, x)
-- outFeats: [U, featNum]
-- nmyLocs: [U, 2], (y, x)
-- nmyFeats: [U, featNum]
+
+* mapFeats
+* ourLocs: [U, 2], (y, x)
+* outFeats: [U, featNum]
+* nmyLocs: [U, 2], (y, x)
+* nmyFeats: [U, featNum]
+
 U = unitNum or enemyNum
 
 ##### MLP对unitFeats用encoder编码
