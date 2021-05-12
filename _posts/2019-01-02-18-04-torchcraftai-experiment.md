@@ -2,21 +2,8 @@
 layout: post
 title: TorchCraftAI 架构和实验
 updated: 2019-01-04 18:04
+math: true
 ---
-
-<head>
-	<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-	<script type="text/x-mathjax-config">
-		MathJax.Hub.Config(
-		{
-			tex2jax: {
-			skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-			inlineMath: [['$','$']]
-		}
-	}
-	);
-</script>
-</head>
 
 * TOC
 {:toc}

@@ -190,12 +190,12 @@ xcopy "C:\Program Files\NVIDIA Corporation\NvToolsExt\bin\x64\nvToolsExt64_1.dll
 
 Cherrypi依赖gflags，glog和ZeroMQ，分别编译
 
-<!-- >* **gflags**
+>* gflags
 >   * 是google的一个开源的处理命令行参数的库，使用c++开发，具备python接口，可以替代getopt。gflags使用起来比getopt方便，但是不支持参数的简写（例如getopt支持--list缩写成-l，gflags不支持）。
->* **glog**
+>* glog
 >   * 是google一个实现应用级别日志的库。该库提供基于C++样式流的API以及多种好用的宏。你只需要简单地使用流导向LOG(<一个严重级别>)即可实现消息记录。
->* **ZeroMQ**
->   * 以嵌入式网络编程库的形式实现了一个并行开发框架（concurrency framework），能够提供进程内(inproc)、进程间(IPC)、网络(TCP)和广播方式的消息信道，并支持扇出(fan-out)、发布-订阅(pub-sub)、任务分发（task distribution）、请求/响应（request-reply）等通信模式。 -->
+>* ZeroMQ
+>   * 以嵌入式网络编程库的形式实现了一个并行开发框架（concurrency framework），能够提供进程内(inproc)、进程间(IPC)、网络(TCP)和广播方式的消息信道，并支持扇出(fan-out)、发布-订阅(pub-sub)、任务分发（task distribution）、请求/响应（request-reply）等通信模式。
 
 编译CherryPi部分遇到LNK1196错误 [官方解释](https://docs.microsoft.com/en-us/cpp/error-messages/tool-errors/linker-tools-error-lnk1169?view=vs-2017)
 

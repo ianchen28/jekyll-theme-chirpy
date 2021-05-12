@@ -2,21 +2,8 @@
 layout: post
 title: TorchCraftAI 代码阅读
 updated: 2019-02-15 15:33
+math: true
 ---
-
-<head>
-	<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-	<script type="text/x-mathjax-config">
-		MathJax.Hub.Config(
-		{
-			tex2jax: {
-			skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-			inlineMath: [['$','$']]
-		}
-	}
-	);
-</script>
-</head>
 
 * TOC
 {:toc}
@@ -184,21 +171,22 @@ $$
 * 对于非当前模型衍生出的perturbed model（如图中G2-2）其diff加权将会额外加入importance sampling weight以抵消不同代模型参数分布的不同
 
 > 重要性采样：
-> - 真实衍生模型的参数采样$x_{o(riginal)}$分布为
+>
+>* 真实衍生模型的参数采样$x_{o(riginal)}$分布为
 >
 > $$
 > x_o \sim \mathcal{N}(Params_o, \sigma) \\
 > \mathcal{P}(x_o)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_o - Params_o)^2}{2\sigma^2}}
 > $$
 >
-> - 需要模拟的衍生模型的参数$x_{c(urrent)}$采样分布为
+>* 需要模拟的衍生模型的参数$x_{c(urrent)}$采样分布为
 >
 > $$
 > x_c \sim \mathcal{N}(Params_c, \sigma) \\
 > \mathcal{P}(x_c)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x_c - Params_c)^2}{2\sigma^2}}
 > $$
 >
-> - 重要性采样权重$iw$(importance sampling weight)为
+>* 重要性采样权重$iw$(importance sampling weight)为
 >
 > $$
 > iw = \frac{\mathcal{P}(Params_p|Params_c, \sigma)}{\mathcal{P}(Params_p|Params_o, \sigma)}\\
@@ -207,14 +195,15 @@ $$
 
 其中$Params_p$为衍生模型参数
 
-## Featurizer
+### Featurizer
+
 特征提取和building placer差不多，但多了UnitStatFeature部分，生成逻辑如下图：
 
 ![MicroManagementFeatureClass](../img/TorchCraftAI/mmfeature.png)
 
-## Model
+### Model
+
 模型部分输出如下：
 
 ![MicroManagementModel1](../img/TorchCraftAI/mmmodel1.png)
 ![MicroManagementModel2](../img/TorchCraftAI/mmmodel2.png)
-
